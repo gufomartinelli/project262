@@ -1,0 +1,63 @@
+import p262io as p_io
+import os
+master_file_for_pages = 'db/pages/master.p262'
+pages_path = 'db/pages/'
+
+CALLER = 'P262FILEMANAGER'
+
+
+def initialize():
+	if os.path.exists(master_file_for_pages):
+		p_io.output(what='Masterfile for pages exists.')
+	else:
+		file = open(master_file_for_pages, 'a')
+		p_io.output(what='Masterfile for pages is missing, created new file.')
+
+
+def check_if_page_exists(_id=None):
+	if _id is not None:
+		if os.path.exists(pages_path + str(_id) + '.p262'):
+			return True
+		else:
+			return False
+	if _id is None:
+		return None
+	
+	
+def add_page_to_db(_id=None, counters=None, essentials=None, friends=None, groups=None):
+	if _id is not None:
+		
+		file = open(master_file_for_pages, 'a')
+		file.write(str(_id) + '\n')
+		file.close()
+		
+		friends_id_array = list()
+		groups_id_array = list()
+		file = open(pages_path + str(_id) + '.p262', 'a')
+		try:
+			if essentials is not None:
+				file.write('FIRST_NAME = ' + str(essentials['first_name']) + '\n')
+				file.write('LAST_NAME = ' + str(essentials['last_name']) + '\n')
+				file.write('GENDER = ' + str(essentials['sex']) + '\n')
+				file.write('CITY = ' + str(essentials['city']) + '\n')
+				if 'photo_200' in essentials.keys():
+					file.write('PHOTO_200 = ' + str(essentials['photo_200']) + '\n')
+				
+			if counters is not None:
+				if 'friends' in counters.keys():
+					file.write('COUNTERS_FRIENDS = ' + str(counters['friends']) + '\n')
+				if 'groups' in counters.keys():
+					file.write('COUNTERS_GROUPS = ' + str(counters['groups']) + '\n')
+				if 'followers' in counters.keys():
+					file.write('COUNTERS_FOLLOWERS = ' + str(counters['followers']) + '\n')
+			if friends is not None:
+				for a in range(0, len(friends)):
+					friends_id_array.append(friends[a]['uid'])
+				file.write('FRIENDLIST = ' + str(friends_id_array) + '\n')
+			if groups is not None:
+				for b in range(0, len(groups)):
+					groups_id_array.append(groups[b]['gid'])
+				file.write('GROUPLIST = ' + str(groups_id_array) + '\n')
+		except:
+			print('COULDNT DO SHIT WITH ' + str(_id))
+			return None
